@@ -1,12 +1,12 @@
 package com.codingbad.vpntoggle.view;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codingbad.vpntoggle.activity.R;
@@ -15,13 +15,13 @@ import com.codingbad.vpntoggle.util.ViewUtil;
 import roboguice.inject.InjectView;
 
 
-public class ItemView extends LinearLayout {
+public class ItemView extends LinearLayout implements CompoundButton.OnCheckedChangeListener {
 
     @InjectView(R.id.item_view_icon)
     private ImageView icon;
 
-    @InjectView(R.id.item_view_text)
-    private TextView label;
+    @InjectView(R.id.item_checkbox)
+    private CheckBox checkBox;
 
     public ItemView(Context context) {
         super(context);
@@ -44,8 +44,9 @@ public class ItemView extends LinearLayout {
     }
 
     public void fill(String text, Uri iconUri) {
-        label.setText(text);
+        checkBox.setText(text);
 
+        checkBox.setOnCheckedChangeListener(this);
         int size = getResources().getDimensionPixelSize(R.dimen.icon_size);
 
         Glide.with(getContext())
@@ -58,4 +59,13 @@ public class ItemView extends LinearLayout {
     }
 
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        LinearLayout parent = (LinearLayout) buttonView.getParent();
+        if (isChecked) {
+            parent.setBackgroundColor(getResources().getColor(R.color.checked));
+        } else {
+            parent.setBackgroundColor(getResources().getColor(R.color.primary_light));
+        }
+    }
 }

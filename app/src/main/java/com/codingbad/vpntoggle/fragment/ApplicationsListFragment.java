@@ -2,10 +2,10 @@ package com.codingbad.vpntoggle.fragment;
 
 import android.Manifest;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,7 +17,7 @@ import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.adapter.ItemAdapter;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 
-import java.security.Permission;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
 
-    public static ApplicationsListFragment newInstance() {
+    public static Fragment newInstance() {
         return new ApplicationsListFragment();
     }
 
@@ -88,10 +88,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
             }
         }
 
-        for (ApplicationItem item : applicationItemMap.values()) {
-            this.adapter.addItem(item);
-        }
-
+        this.adapter.addItemList(new ArrayList<ApplicationItem>(applicationItemMap.values()));
     }
 
     @Override
