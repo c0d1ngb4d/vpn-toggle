@@ -12,6 +12,7 @@ import android.net.Uri;
 public class ApplicationItem {
     private String applicationsList;
     private Uri iconUri;
+    private boolean isSelected = false;
 
     public ApplicationItem(Uri icon, String applicationsList) {
         this.applicationsList = applicationsList;
@@ -28,5 +29,10 @@ public class ApplicationItem {
 
     public void addApplication(String appName) {
         this.applicationsList = this.applicationsList.concat(", " + appName);
+    }
+
+    // TODO: check from saved data
+    public boolean isSelected() {
+        return isSelected;
     }
 }

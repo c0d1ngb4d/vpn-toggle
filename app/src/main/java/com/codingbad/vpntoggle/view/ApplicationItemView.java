@@ -15,7 +15,7 @@ import com.codingbad.vpntoggle.util.ViewUtil;
 import roboguice.inject.InjectView;
 
 
-public class ItemView extends LinearLayout implements CompoundButton.OnCheckedChangeListener {
+public class ApplicationItemView extends LinearLayout implements CompoundButton.OnCheckedChangeListener {
 
     @InjectView(R.id.item_view_icon)
     private ImageView icon;
@@ -23,17 +23,17 @@ public class ItemView extends LinearLayout implements CompoundButton.OnCheckedCh
     @InjectView(R.id.item_checkbox)
     private CheckBox checkBox;
 
-    public ItemView(Context context) {
+    public ApplicationItemView(Context context) {
         super(context);
         init();
     }
 
-    public ItemView(Context context, AttributeSet attrs) {
+    public ApplicationItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public ItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ApplicationItemView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }

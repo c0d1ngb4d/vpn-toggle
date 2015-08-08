@@ -28,11 +28,10 @@ import roboguice.inject.InjectView;
 /**
  * Created by ayi on 6/26/15.
  */
-public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements ItemAdapter.RecyclerViewListener {
+public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> {
 
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
-    private ItemAdapter adapter;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -52,17 +51,20 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
 
     private void setupRecyclerView() {
         recyclerView.setHasFixedSize(true);
+        // set layout manager which positions items in the screen
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
-
         recyclerView.setLayoutManager(layoutManager);
+
+        // ItemAnimator animates views
         recyclerView.setItemAnimator(new FadeInAnimator());
 
-        adapter = new ItemAdapter(this);
-        getDeviceApplications();
+
+        ItemAdapter adapter = new ItemAdapter();
+        adapter.addItemList(getDeviceApplications());
         recyclerView.setAdapter(adapter);
     }
 
-    private void getDeviceApplications() {
+    private ArrayList<ApplicationItem> getDeviceApplications() {
         final PackageManager packageManager = getActivity().getPackageManager();
         List<ApplicationInfo> installedApplications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
@@ -88,12 +90,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
             }
         }
 
-        this.adapter.addItemList(new ArrayList<ApplicationItem>(applicationItemMap.values()));
-    }
-
-    @Override
-    public void onItemClickListener(View view, int position) {
-
+        return new ArrayList<ApplicationItem>(applicationItemMap.values());
     }
 
     public interface Callbacks {

@@ -8,21 +8,20 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 
+import com.codingbad.vpntoggle.holder.ApplicationViewHolder;
 import com.codingbad.vpntoggle.model.ApplicationItem;
-import com.codingbad.vpntoggle.view.ItemView;
+import com.codingbad.vpntoggle.view.ApplicationItemView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+public class ItemAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
 
     private List<ApplicationItem> applicationList;
-    private RecyclerViewListener recyclerViewListener;
     private int lastPosition = -1;
 
-    public ItemAdapter(RecyclerViewListener recyclerViewListener) {
-        this.recyclerViewListener = recyclerViewListener;
+    public ItemAdapter() {
         this.applicationList = new ArrayList<>();
     }
 
@@ -32,36 +31,27 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ItemView view = new ItemView(parent.getContext());
+    public ApplicationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ApplicationItemView view = new ApplicationItemView(parent.getContext());
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        return new ViewHolder(view);
+        return new ApplicationViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ApplicationViewHolder holder, int position) {
         final ApplicationItem applicationItem = applicationList.get(position);
 
-
         if (position > lastPosition) {
-            for (Animator anim : getAnimators(holder.itemView)) {
+            for (Animator anim : getAnimators(holder.getApplicationItemView())) {
                 anim.setDuration(500).start();
                 anim.setInterpolator(new LinearInterpolator());
             }
-//            Animator anim = getAnimator(holder.itemView);
-//            anim.setDuration(500).start();
-//            anim.setInterpolator(new LinearInterpolator());
+
             lastPosition = position;
         }
-        holder.itemView.fill(applicationItem.getApplicationsList(), applicationItem.getIconUri());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // nothing to be done on click
-            }
-        });
+        holder.bind(applicationItem);
     }
 
     public void addItem(ApplicationItem applicationItem) {
@@ -108,26 +98,5 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     protected Animator getAlphaAnimator(final View view) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(view, "alpha", 0.0f, 1.0f);
         return anim;
-    }
-
-    public interface RecyclerViewListener {
-        void onItemClickListener(View view, int position);
-
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private final ItemView itemView;
-
-        public ViewHolder(ItemView itemView) {
-            super(itemView);
-            this.itemView = itemView;
-            this.itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            recyclerViewListener.onItemClickListener(v, getAdapterPosition());
-        }
     }
 }
