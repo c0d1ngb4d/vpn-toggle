@@ -3,6 +3,8 @@ package com.codingbad.vpntoggle.view;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -13,6 +15,7 @@ import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.util.ViewUtil;
 
 import roboguice.inject.InjectView;
+
 
 
 public class ApplicationItemView extends LinearLayout implements CompoundButton.OnCheckedChangeListener {
@@ -40,6 +43,7 @@ public class ApplicationItemView extends LinearLayout implements CompoundButton.
 
     private void init() {
         inflate(getContext(), R.layout.item_view, this);
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         ViewUtil.reallyInjectViews(this);
     }
 

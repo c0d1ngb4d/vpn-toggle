@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 import com.codingbad.library.fragment.AbstractFragment;
 import com.codingbad.vpntoggle.activity.R;
-import com.codingbad.vpntoggle.adapter.ItemAdapter;
+import com.codingbad.vpntoggle.adapter.ItemsAdapter;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         recyclerView.setItemAnimator(new FadeInAnimator());
 
 
-        ItemAdapter adapter = new ItemAdapter();
+        ItemsAdapter adapter = new ItemsAdapter();
         adapter.addItemList(getDeviceApplications());
         recyclerView.setAdapter(adapter);
     }

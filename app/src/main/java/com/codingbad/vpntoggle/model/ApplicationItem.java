@@ -35,4 +35,8 @@ public class ApplicationItem {
     public boolean isSelected() {
         return isSelected;
     }
+
+    public void setSelection(boolean selected) {
+        isSelected = selected;
+    }
 }

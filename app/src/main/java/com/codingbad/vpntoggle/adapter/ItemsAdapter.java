@@ -3,11 +3,13 @@ package com.codingbad.vpntoggle.adapter;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 
+import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.holder.ApplicationViewHolder;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.view.ApplicationItemView;
@@ -16,12 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ItemAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
+public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
 
     private List<ApplicationItem> applicationList;
     private int lastPosition = -1;
 
-    public ItemAdapter() {
+    public ItemsAdapter() {
         this.applicationList = new ArrayList<>();
     }
 
@@ -33,7 +35,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
     @Override
     public ApplicationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ApplicationItemView view = new ApplicationItemView(parent.getContext());
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         return new ApplicationViewHolder(view);
     }
