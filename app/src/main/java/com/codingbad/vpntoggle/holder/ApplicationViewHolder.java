@@ -1,12 +1,9 @@
 package com.codingbad.vpntoggle.holder;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 
 import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.model.ApplicationItem;
@@ -32,7 +29,7 @@ public class ApplicationViewHolder extends RecyclerView.ViewHolder implements Co
         this.applicationItem = applicationItem;
         this.checkbox.setChecked(applicationItem.isSelected());
 
-        applicationItemView.fill(applicationItem.getApplicationsList(), applicationItem.getIconUri());
+        applicationItemView.fill(applicationItem.getApplicationName(), applicationItem.getIconUri());
         checkbox.setOnCheckedChangeListener(this);
     }
 

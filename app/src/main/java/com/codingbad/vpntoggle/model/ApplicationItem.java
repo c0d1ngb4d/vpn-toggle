@@ -10,17 +10,17 @@ import android.net.Uri;
  * separated list of the applications' names.
  */
 public class ApplicationItem {
-    private String applicationsList;
+    private String applicationName;
     private Uri iconUri;
     private boolean isSelected = false;
 
     public ApplicationItem(Uri icon, String applicationsList) {
-        this.applicationsList = applicationsList;
+        this.applicationName = applicationsList;
         this.iconUri = icon;
     }
 
-    public String getApplicationsList() {
-        return this.applicationsList;
+    public String getApplicationName() {
+        return this.applicationName;
     }
 
     public Uri getIconUri() {
@@ -28,7 +28,7 @@ public class ApplicationItem {
     }
 
     public void addApplication(String appName) {
-        this.applicationsList = this.applicationsList.concat(", " + appName);
+        this.applicationName = this.applicationName.concat(", " + appName);
     }
 
     // TODO: check from saved data
