@@ -3,28 +3,28 @@ package com.codingbad.vpntoggle.view;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.codingbad.library.view.ThreeStatesButton;
 import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.util.ViewUtil;
 
 import roboguice.inject.InjectView;
 
-
-
-public class ApplicationItemView extends LinearLayout implements CompoundButton.OnCheckedChangeListener {
+public class ApplicationItemView extends LinearLayout {
 
     @InjectView(R.id.item_view_icon)
     private ImageView icon;
 
-    @InjectView(R.id.item_checkbox)
-    private CheckBox checkBox;
+    @InjectView(R.id.item_button)
+    private ThreeStatesButton stateButton;
+
+    @InjectView(R.id.item_text)
+    private TextView textButton;
 
     public ApplicationItemView(Context context) {
         super(context);
@@ -47,10 +47,10 @@ public class ApplicationItemView extends LinearLayout implements CompoundButton.
         ViewUtil.reallyInjectViews(this);
     }
 
-    public void fill(String text, Uri iconUri) {
-        checkBox.setText(text);
+    public void fill(String text, Uri iconUri, ThreeStatesButton.StateEnum state) {
+        textButton.setText(text);
 
-        checkBox.setOnCheckedChangeListener(this);
+        stateButton.setState(state);
         int size = getResources().getDimensionPixelSize(R.dimen.icon_size);
 
         Glide.with(getContext())
@@ -60,16 +60,5 @@ public class ApplicationItemView extends LinearLayout implements CompoundButton.
                 .override(size, size)
                 .placeholder(R.drawable.ic_thumbnail)
                 .into(this.icon);
-    }
-
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        LinearLayout parent = (LinearLayout) buttonView.getParent();
-        if (isChecked) {
-            parent.setBackgroundColor(getResources().getColor(R.color.checked));
-        } else {
-            parent.setBackgroundColor(getResources().getColor(R.color.primary_light));
-        }
     }
 }

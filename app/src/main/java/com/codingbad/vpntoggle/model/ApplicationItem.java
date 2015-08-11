@@ -2,6 +2,8 @@ package com.codingbad.vpntoggle.model;
 
 import android.net.Uri;
 
+import com.codingbad.library.view.ThreeStatesButton;
+
 /**
  * Created by ayi on 7/19/15.
  *
@@ -12,7 +14,7 @@ import android.net.Uri;
 public class ApplicationItem {
     private String applicationName;
     private Uri iconUri;
-    private boolean isSelected = false;
+    private ThreeStatesButton.StateEnum state = ThreeStatesButton.StateEnum.AUTOMATIC;
 
     public ApplicationItem(Uri icon, String applicationsList) {
         this.applicationName = applicationsList;
@@ -31,12 +33,11 @@ public class ApplicationItem {
         this.applicationName = this.applicationName.concat(", " + appName);
     }
 
-    // TODO: check from saved data
-    public boolean isSelected() {
-        return isSelected;
+    public void setState(ThreeStatesButton.StateEnum state) {
+        this.state = state;
     }
 
-    public void setSelection(boolean selected) {
-        isSelected = selected;
+    public ThreeStatesButton.StateEnum getState() {
+        return state;
     }
 }
