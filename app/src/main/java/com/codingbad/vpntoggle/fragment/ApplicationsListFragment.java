@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,7 +34,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private Parcelable listState;
+    private ArrayList<ApplicationItem> applications;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -57,9 +56,13 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onResume() {
         super.onResume();
 
-        if (listState != null) {
-            layoutManager.onRestoreInstanceState(listState);
+        if (applications == null) {
+            applications = getDeviceApplications();
         }
+
+        ItemsAdapter adapter = new ItemsAdapter();
+        adapter.addItemList(applications);
+        recyclerView.setAdapter(adapter);
     }
 
     private void setupRecyclerView() {
@@ -70,25 +73,20 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
 
         // ItemAnimator animates views
         recyclerView.setItemAnimator(new FadeInAnimator());
-
-        ItemsAdapter adapter = new ItemsAdapter();
-        adapter.addItemList(getDeviceApplications());
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(LIST_STATE);
+            applications = savedInstanceState.getParcelableArrayList(LIST_STATE);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        listState = layoutManager.onSaveInstanceState();
-        outState.putParcelable(LIST_STATE, listState);
+        outState.putParcelableArrayList(LIST_STATE, applications);
     }
 
     private ArrayList<ApplicationItem> getDeviceApplications() {
