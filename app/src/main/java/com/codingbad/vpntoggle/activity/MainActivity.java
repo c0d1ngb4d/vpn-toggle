@@ -7,6 +7,8 @@ import android.view.MenuItem;
 import com.codingbad.library.activity.AbstractSideBarActivity;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
 
+import task.Startup;
+
 public class MainActivity extends AbstractSideBarActivity implements ApplicationsListFragment.Callbacks {
 
     @Override
@@ -36,6 +38,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            (new Startup()).setContext(this).execute();
             return true;
         }
 

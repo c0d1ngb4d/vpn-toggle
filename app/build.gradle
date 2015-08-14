@@ -35,4 +35,7 @@ dependencies {
     compile project(':codingbad_lib')
     compile 'com.github.bumptech.glide:glide:3.6.0'
     compile 'jp.wasabeef:recyclerview-animators:1.2.0@aar'
+
+    // su library
+    compile 'eu.chainfire:libsuperuser:1.0.0.+'
 }
