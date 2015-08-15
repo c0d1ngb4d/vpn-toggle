@@ -4,8 +4,6 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.codingbad.library.view.ThreeStatesButton;
-
 /**
  * Created by ayi on 7/19/15.
  *
@@ -18,13 +16,43 @@ public class ApplicationItem implements Parcelable {
     private String iconUri;
     private int state;
 
+    public enum StateEnum {
+        THROUGH_VPN, AVOID_VPN, BLOCK;
+
+        public int toInt() {
+            switch (this) {
+                case THROUGH_VPN:
+                    return 0;
+                case AVOID_VPN:
+                    return 1;
+                case BLOCK:
+                    return 2;
+                default:
+                    return -1;
+            }
+        }
+
+        public static StateEnum fromInt(int number) {
+            switch (number) {
+                case 0:
+                    return THROUGH_VPN;
+                case 1:
+                    return AVOID_VPN;
+                case 2:
+                    return BLOCK;
+                default:
+                    return THROUGH_VPN;
+            }
+        }
+    }
+
     public ApplicationItem(Uri icon, String applicationName) {
         this.applicationName = applicationName;
         if (icon != null) {
             this.iconUri = icon.toString();
         }
 
-        state = ThreeStatesButton.StateEnum.THROUGH_VPN.toInt();
+        state = StateEnum.THROUGH_VPN.toInt();
     }
 
     public void setApplicationName(String applicationName) {
@@ -55,12 +83,12 @@ public class ApplicationItem implements Parcelable {
         this.applicationName = this.applicationName.concat(", " + appName);
     }
 
-    public void setState(ThreeStatesButton.StateEnum state) {
+    public void setState(StateEnum state) {
         this.state = state.toInt();
     }
 
-    public ThreeStatesButton.StateEnum getState() {
-        return ThreeStatesButton.StateEnum.fromInt(state);
+    public StateEnum getState() {
+        return StateEnum.fromInt(state);
     }
 
     @Override

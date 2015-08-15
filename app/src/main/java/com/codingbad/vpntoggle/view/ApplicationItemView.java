@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.codingbad.library.view.ThreeStatesButton;
 import com.codingbad.vpntoggle.R;
+import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.util.ViewUtil;
 
 import roboguice.inject.InjectView;
@@ -47,10 +48,10 @@ public class ApplicationItemView extends LinearLayout {
         ViewUtil.reallyInjectViews(this);
     }
 
-    public void fill(String text, Uri iconUri, ThreeStatesButton.StateEnum state) {
+    public void fill(String text, Uri iconUri, ApplicationItem.StateEnum state) {
         textButton.setText(text);
 
-        stateButton.setState(state);
+        stateButton.setState(state.toInt());
         int size = getResources().getDimensionPixelSize(R.dimen.icon_size);
 
         Glide.with(getContext())

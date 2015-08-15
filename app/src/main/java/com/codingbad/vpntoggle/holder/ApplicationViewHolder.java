@@ -36,17 +36,17 @@ public class ApplicationViewHolder extends RecyclerView.ViewHolder implements Th
     }
 
     @Override
-    public void onSendThroughVpn() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.THROUGH_VPN);
+    public void onState1() {
+        this.applicationItem.setState(ApplicationItem.StateEnum.THROUGH_VPN);
     }
 
     @Override
-    public void onAvoidVpn() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.AVOID_VPN);
+    public void onState2() {
+        this.applicationItem.setState(ApplicationItem.StateEnum.AVOID_VPN);
     }
 
     @Override
-    public void onBlock() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.BLOCK);
+    public void onState3() {
+        this.applicationItem.setState(ApplicationItem.StateEnum.BLOCK);
     }
 }
