@@ -1,3 +1,3 @@
 include ':app'
 include ':codingbad_lib'
-project (':codingbad_lib').projectDir = new File(settingsDir, '../tap_counter/library')
+project (':codingbad_lib').projectDir = new File(settingsDir, '../codingbad_lib/library')
