@@ -46,7 +46,7 @@ public class Startup extends AsyncTask<Void, Void, Void> {
         if (suAvailable) {
             suVersion = Shell.SU.version(false);
             suVersionInternal = Shell.SU.version(true);
-            suResult = Shell.SU.run(new String[] {
+            suResult = Shell.SU.run(new String[]{
                     "id",
                     "ls -l /"
             });
@@ -54,7 +54,10 @@ public class Startup extends AsyncTask<Void, Void, Void> {
 
         // This is just so you see we had a progress dialog,
         // don't do this in production code
-        try { Thread.sleep(5000); } catch(Exception e) { }
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+        }
 
         return null;
     }
@@ -65,13 +68,13 @@ public class Startup extends AsyncTask<Void, Void, Void> {
 
         // output
         StringBuilder sb = (new StringBuilder()).
-                append("Root? ").append(suAvailable ? "Yes" : "No").append((char)10).
-                append("Version: ").append(suVersion == null ? "N/A" : suVersion).append((char)10).
-                append("Version (internal): ").append(suVersionInternal == null ? "N/A" : suVersionInternal).append((char)10).
-                append((char)10);
+                append("Root? ").append(suAvailable ? "Yes" : "No").append((char) 10).
+                append("Version: ").append(suVersion == null ? "N/A" : suVersion).append((char) 10).
+                append("Version (internal): ").append(suVersionInternal == null ? "N/A" : suVersionInternal).append((char) 10).
+                append((char) 10);
         if (suResult != null) {
             for (String line : suResult) {
-                sb.append(line).append((char)10);
+                sb.append(line).append((char) 10);
             }
         }
         Toast.makeText(context, sb.toString(), Toast.LENGTH_LONG).show();

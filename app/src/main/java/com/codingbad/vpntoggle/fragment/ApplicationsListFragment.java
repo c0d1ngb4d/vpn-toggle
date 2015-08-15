@@ -20,9 +20,9 @@ import com.codingbad.vpntoggle.adapter.ItemsAdapter;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import roboguice.inject.InjectView;

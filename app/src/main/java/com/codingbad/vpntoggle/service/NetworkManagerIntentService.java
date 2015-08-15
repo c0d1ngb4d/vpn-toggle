@@ -1,8 +1,8 @@
 package com.codingbad.vpntoggle.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import com.codingbad.library.utils.ComplexSharedPreference;
 import com.codingbad.vpntoggle.model.ApplicationItem;
@@ -24,6 +24,10 @@ public class NetworkManagerIntentService extends IntentService {
     private static final String ACTION_CHANGE = "com.codingbad.vpntoggle.service.action.CHANGE";
     private static final String ACTION_INIT = "com.codingbad.vpntoggle.service.action.INIT";
     private static final String APPLICATIONS = "applications";
+
+    public NetworkManagerIntentService() {
+        super("NetworkManagerIntentService");
+    }
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -49,10 +53,6 @@ public class NetworkManagerIntentService extends IntentService {
         context.startService(intent);
     }
 
-    public NetworkManagerIntentService() {
-        super("NetworkManagerIntentService");
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -72,7 +72,7 @@ public class NetworkManagerIntentService extends IntentService {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
-            for (;networkInterfaces.hasMoreElements();) {
+            for (; networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
                 if (networkInterface.getName().contains("tun")) {
                     return true;
@@ -96,17 +96,17 @@ public class NetworkManagerIntentService extends IntentService {
 
     private void handleActionInit() {
         updateIPTables();
-        if(isVpnConnected()){
+        if (isVpnConnected()) {
             setRoutingForMarkedPackets();
             addGatewayToDefaultTable();
         }
     }
 
-    private void removeGatewayFromDefaultTable(){
+    private void removeGatewayFromDefaultTable() {
 
     }
 
-    private void dropIPTables(){
+    private void dropIPTables() {
 
     }
 
@@ -114,16 +114,16 @@ public class NetworkManagerIntentService extends IntentService {
         dropIPTables();
 
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
-        for(ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
+        for (ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
 
         }
     }
 
-    private void setRoutingForMarkedPackets(){
+    private void setRoutingForMarkedPackets() {
 
     }
 
-    private void addGatewayToDefaultTable(){
+    private void addGatewayToDefaultTable() {
 
     }
 }

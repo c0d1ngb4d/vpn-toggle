@@ -8,9 +8,9 @@ import com.codingbad.library.activity.AbstractSideBarActivity;
 import com.codingbad.library.utils.ComplexSharedPreference;
 import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
-
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
+
 import java.util.List;
 
 public class MainActivity extends AbstractSideBarActivity implements ApplicationsListFragment.Callbacks {
