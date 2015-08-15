@@ -1,8 +1,8 @@
 package com.codingbad.vpntoggle.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -35,6 +35,10 @@ public class NetworkManagerIntentService extends IntentService {
     private static final String ACTION_INIT = "com.codingbad.vpntoggle.service.action.INIT";
     private static final String APPLICATIONS = "applications";
 
+    public NetworkManagerIntentService() {
+        super("NetworkManagerIntentService");
+    }
+
     /**
      * Starts this service to perform action Foo with the given parameters. If
      * the service is already performing a task this action will be queued.
@@ -59,10 +63,6 @@ public class NetworkManagerIntentService extends IntentService {
         context.startService(intent);
     }
 
-    public NetworkManagerIntentService() {
-        super("NetworkManagerIntentService");
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -82,7 +82,7 @@ public class NetworkManagerIntentService extends IntentService {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
-            for (;networkInterfaces.hasMoreElements();) {
+            for (; networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
                 if (networkInterface.getName().contains("tun")) {
                     return true;
@@ -106,17 +106,17 @@ public class NetworkManagerIntentService extends IntentService {
 
     private void handleActionInit() {
         updateIPTables();
-        if(isVpnConnected()){
+        if (isVpnConnected()) {
             setRoutingForMarkedPackets();
             addGatewayToDefaultTable();
         }
     }
 
-    private void removeGatewayFromDefaultTable(){
+    private void removeGatewayFromDefaultTable() {
 
     }
 
-    private void dropIPTables(){
+    private void dropIPTables() {
         Shell.SU.run(new String[]{
                 "iptables -F",
                 "iptables -X",
@@ -131,21 +131,21 @@ public class NetworkManagerIntentService extends IntentService {
         dropIPTables();
 
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
-        for(ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
+        for (ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
         }
     }
 
-    private void setRoutingForMarkedPackets(){
+    private void setRoutingForMarkedPackets() {
 
     }
 
-    private void addGatewayToDefaultTable(){
+    private void addGatewayToDefaultTable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo net = connectivityManager.getActiveNetworkInfo();
         String interfaceName = null;
-        switch (net.getType()){
+        switch (net.getType()) {
             case ConnectivityManager.TYPE_MOBILE:
-               interfaceName = getMobileNetworkName();
+                interfaceName = getMobileNetworkName();
                 break;
             case ConnectivityManager.TYPE_WIFI:
                 interfaceName = getWifiNetworkName();
@@ -153,7 +153,7 @@ public class NetworkManagerIntentService extends IntentService {
             default:
                 Log.d("VPNTOGGLE", "Unknown type " + net.getType());
         }
-        if(interfaceName != null){
+        if (interfaceName != null) {
 
         }
     }
@@ -163,7 +163,7 @@ public class NetworkManagerIntentService extends IntentService {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
-            for (;networkInterfaces.hasMoreElements();) {
+            for (; networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
 
             }
@@ -188,6 +188,6 @@ public class NetworkManagerIntentService extends IntentService {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-    return null;
+        return null;
     }
 }
