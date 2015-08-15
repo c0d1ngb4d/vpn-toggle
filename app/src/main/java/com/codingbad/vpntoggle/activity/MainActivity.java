@@ -5,9 +5,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.codingbad.library.activity.AbstractSideBarActivity;
+import com.codingbad.library.utils.ComplexSharedPreference;
+import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
 
+import com.codingbad.vpntoggle.model.ApplicationItem;
+import com.codingbad.vpntoggle.model.ListOfApplicationItems;
+import java.util.List;
+
 public class MainActivity extends AbstractSideBarActivity implements ApplicationsListFragment.Callbacks {
+
+    private static final String APPLICATIONS = "applications";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,4 +50,19 @@ public class MainActivity extends AbstractSideBarActivity implements Application
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onChangesApplied(List<ApplicationItem> applicationItems) {
+        ListOfApplicationItems listOfApplicationItems = new ListOfApplicationItems();
+        listOfApplicationItems.applicationItems = applicationItems;
+        ComplexSharedPreference.write(this, listOfApplicationItems, APPLICATIONS);
+    }
+
+    @Override
+    public List<ApplicationItem> getApplicationsSavedStatus() {
+        ListOfApplicationItems items = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
+        if (items == null) {
+            return null;
+        }
+        return items.applicationItems;
+    }
 }

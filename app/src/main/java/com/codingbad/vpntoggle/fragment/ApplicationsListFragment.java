@@ -5,15 +5,17 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.codingbad.library.fragment.AbstractFragment;
-import com.codingbad.vpntoggle.activity.R;
+import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.adapter.ItemsAdapter;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 
@@ -34,7 +36,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private ArrayList<ApplicationItem> applications;
+    private List<ApplicationItem> applications;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -53,11 +55,27 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_apply) {
+            callbacks.onChangesApplied(applications);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
         if (applications == null) {
-            applications = getDeviceApplications();
+            applications = callbacks.getApplicationsSavedStatus();
+            if (applications == null) {
+                applications = getDeviceApplications();
+            }
         }
 
         ItemsAdapter adapter = new ItemsAdapter();
@@ -86,7 +104,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(LIST_STATE, applications);
+        outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications);
     }
 
     private ArrayList<ApplicationItem> getDeviceApplications() {
@@ -119,5 +137,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     }
 
     public interface Callbacks {
+        void onChangesApplied(List<ApplicationItem> applicationItems);
+
+        List<ApplicationItem> getApplicationsSavedStatus();
     }
 }

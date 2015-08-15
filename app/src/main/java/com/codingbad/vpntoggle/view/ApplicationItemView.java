@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.codingbad.library.view.ThreeStatesButton;
-import com.codingbad.vpntoggle.activity.R;
+import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.util.ViewUtil;
 
 import roboguice.inject.InjectView;

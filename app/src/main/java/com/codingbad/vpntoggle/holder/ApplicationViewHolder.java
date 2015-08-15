@@ -2,11 +2,9 @@ package com.codingbad.vpntoggle.holder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import com.codingbad.library.view.ThreeStatesButton;
-import com.codingbad.vpntoggle.activity.R;
+import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.view.ApplicationItemView;
 
@@ -17,20 +15,20 @@ import com.codingbad.vpntoggle.view.ApplicationItemView;
 public class ApplicationViewHolder extends RecyclerView.ViewHolder implements ThreeStatesButton.StateListener {
 
     private final ApplicationItemView applicationItemView;
-    private final ThreeStatesButton checkbox;
+    private final ThreeStatesButton threeStatesButton;
     private ApplicationItem applicationItem;
 
     public ApplicationViewHolder(ApplicationItemView itemView) {
         super(itemView);
         this.applicationItemView = itemView;
-        this.checkbox = (ThreeStatesButton) itemView.findViewById(R.id.item_button);
+        this.threeStatesButton = (ThreeStatesButton) itemView.findViewById(R.id.item_button);
     }
 
     public void bind(ApplicationItem applicationItem) {
         this.applicationItem = applicationItem;
 
         applicationItemView.fill(applicationItem.getApplicationName(), applicationItem.getIconUri(), applicationItem.getState());
-        checkbox.setStateListener(this);
+        threeStatesButton.setStateListener(this);
     }
 
     public View getApplicationItemView() {
@@ -38,17 +36,17 @@ public class ApplicationViewHolder extends RecyclerView.ViewHolder implements Th
     }
 
     @Override
-    public void onAutomatic() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.AUTOMATIC);
+    public void onSendThroughVpn() {
+        this.applicationItem.setState(ThreeStatesButton.StateEnum.THROUGH_VPN);
     }
 
     @Override
-    public void onOn() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.ON);
+    public void onAvoidVpn() {
+        this.applicationItem.setState(ThreeStatesButton.StateEnum.AVOID_VPN);
     }
 
     @Override
-    public void onOff() {
-        this.applicationItem.setState(ThreeStatesButton.StateEnum.OFF);
+    public void onBlock() {
+        this.applicationItem.setState(ThreeStatesButton.StateEnum.BLOCK);
     }
 }

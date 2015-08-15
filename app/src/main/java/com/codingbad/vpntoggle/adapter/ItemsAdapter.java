@@ -3,13 +3,10 @@ package com.codingbad.vpntoggle.adapter;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
-
-import com.codingbad.vpntoggle.activity.R;
 import com.codingbad.vpntoggle.holder.ApplicationViewHolder;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.view.ApplicationItemView;

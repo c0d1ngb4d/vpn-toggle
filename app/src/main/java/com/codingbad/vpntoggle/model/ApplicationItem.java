@@ -15,12 +15,28 @@ import com.codingbad.library.view.ThreeStatesButton;
  */
 public class ApplicationItem implements Parcelable {
     private String applicationName;
-    private Uri iconUri;
-    private ThreeStatesButton.StateEnum state = ThreeStatesButton.StateEnum.AUTOMATIC;
+    private String iconUri;
+    private int state;
 
     public ApplicationItem(Uri icon, String applicationName) {
         this.applicationName = applicationName;
-        this.iconUri = icon;
+        if (icon != null) {
+            this.iconUri = icon.toString();
+        }
+
+        state = ThreeStatesButton.StateEnum.THROUGH_VPN.toInt();
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setIconUri(String iconUri) {
+        this.iconUri = iconUri;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     public String getApplicationName() {
@@ -28,7 +44,11 @@ public class ApplicationItem implements Parcelable {
     }
 
     public Uri getIconUri() {
-        return this.iconUri;
+        if (this.iconUri == null) {
+            return null;
+        }
+
+        return Uri.parse(this.iconUri);
     }
 
     public void addApplication(String appName) {
@@ -36,11 +56,11 @@ public class ApplicationItem implements Parcelable {
     }
 
     public void setState(ThreeStatesButton.StateEnum state) {
-        this.state = state;
+        this.state = state.toInt();
     }
 
     public ThreeStatesButton.StateEnum getState() {
-        return state;
+        return ThreeStatesButton.StateEnum.fromInt(state);
     }
 
     @Override
@@ -51,14 +71,8 @@ public class ApplicationItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(applicationName);
-        String iconUriString = null;
-
-        if (this.iconUri != null) {
-            iconUriString = this.iconUri.toString();
-        }
-
-        dest.writeString(iconUriString);
-        dest.writeInt(state.toInt());
+        dest.writeString(this.iconUri);
+        dest.writeInt(state);
     }
 
     public static final Parcelable.Creator<ApplicationItem> CREATOR
@@ -74,7 +88,7 @@ public class ApplicationItem implements Parcelable {
 
     private ApplicationItem(Parcel in) {
         this.applicationName = in.readString();
-        this.iconUri = Uri.parse(in.readString());
-        this.state = ThreeStatesButton.StateEnum.fromInt(in.readInt());
+        this.iconUri = in.readString();
+        this.state = in.readInt();
     }
 }
