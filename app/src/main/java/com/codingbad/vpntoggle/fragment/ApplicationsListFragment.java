@@ -128,7 +128,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
                     applicationItem.addApplication(appName);
                     applicationItemMap.put(appUid, applicationItem);
                 } else {
-                    applicationItemMap.put(appUid, new ApplicationItem(appIconUri, appName));
+                    applicationItemMap.put(appUid, new ApplicationItem(appIconUri, appName, appUid));
                 }
             }
         }

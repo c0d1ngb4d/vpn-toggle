@@ -23,11 +23,13 @@ public class ApplicationItem implements Parcelable {
         }
     };
     private String applicationName;
+    private int uid;
     private String iconUri;
     private int state;
 
-    public ApplicationItem(Uri icon, String applicationName) {
+    public ApplicationItem(Uri icon, String applicationName, int uid) {
         this.applicationName = applicationName;
+        this.uid = uid;
         if (icon != null) {
             this.iconUri = icon.toString();
         }
@@ -37,6 +39,7 @@ public class ApplicationItem implements Parcelable {
 
     private ApplicationItem(Parcel in) {
         this.applicationName = in.readString();
+        this.uid = in.readInt();
         this.iconUri = in.readString();
         this.state = in.readInt();
     }
@@ -85,13 +88,13 @@ public class ApplicationItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(applicationName);
+        dest.writeInt(this.uid);
         dest.writeString(this.iconUri);
         dest.writeInt(state);
     }
 
-    public String getUID() {
-        //TODO: save UID for app
-        return null;
+    public int getUID() {
+        return this.uid;
     }
 
     public enum StateEnum {
