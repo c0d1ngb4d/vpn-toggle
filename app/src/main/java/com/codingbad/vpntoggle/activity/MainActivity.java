@@ -10,6 +10,8 @@ import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
+import com.codingbad.vpntoggle.receiver.NetworkChangeReceiver;
+import com.codingbad.vpntoggle.service.NetworkManagerIntentService;
 
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class MainActivity extends AbstractSideBarActivity implements Application
 
     @Override
     public void onChangesApplied(List<ApplicationItem> applicationItems) {
+        //start broadcast receiver to update changes
+        NetworkManagerIntentService.startActionRefresh(this);
         ListOfApplicationItems listOfApplicationItems = new ListOfApplicationItems();
         listOfApplicationItems.applicationItems = applicationItems;
         ComplexSharedPreference.write(this, listOfApplicationItems, APPLICATIONS);
