@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.codingbad.library.utils.ComplexSharedPreference;
 import com.codingbad.vpntoggle.model.ApplicationItem;
@@ -19,6 +20,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.List;
 
 import eu.chainfire.libsuperuser.Shell;
 
@@ -34,6 +36,30 @@ public class NetworkManagerIntentService extends IntentService {
     private static final String ACTION_CHANGE = "com.codingbad.vpntoggle.service.action.CHANGE";
     private static final String ACTION_INIT = "com.codingbad.vpntoggle.service.action.INIT";
     private static final String APPLICATIONS = "applications";
+
+    private static final int DROP_TABLES_CODE = 0;
+    private static final int BLOCK_IPTABLES_CODE = 1;
+    private static final int AVOID_VPN_IPTABLES_CODE = 1;
+    private static final int POSTROUTING_IPTABLES_CODE = 2;
+    private static final int ROUTING_MARKED_PACKETS_CODE = 3;
+
+    private static Shell.Interactive rootSession;
+
+    private static Shell.OnCommandResultListener errorCallback = new Shell.OnCommandResultListener() {
+
+        @Override
+        public void onCommandResult(int commandCode, int exitCode, List<String> list) {
+            if (exitCode < 0) {
+                reportError("Error executing commands:" +
+                        commandCode+" exitCode " + exitCode);
+            }
+        }
+    };
+
+    private static void reportError(String error){
+        Log.d("VPNTOGGLE", error);
+    }
+
 
     public NetworkManagerIntentService() {
         super("NetworkManagerIntentService");
@@ -66,6 +92,13 @@ public class NetworkManagerIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            if(rootSession == null){
+                rootSession = new Shell.Builder().
+                        useSU().
+                        setWantSTDERR(true).
+                        setWatchdogTimeout(5).
+                        setMinimalLogging(true).open();
+            }
             final String action = intent.getAction();
             if (ACTION_REFRESH.equals(action)) {
                 handleActionRefresh();
@@ -100,8 +133,9 @@ public class NetworkManagerIntentService extends IntentService {
     }
 
     private void handleActionChange() {
-        removeGatewayFromDefaultTable();
-        addGatewayToDefaultTable();
+        if(isVpnConnected()) {
+            addGatewayToDefaultTable();
+        }
     }
 
     private void handleActionInit() {
@@ -112,31 +146,51 @@ public class NetworkManagerIntentService extends IntentService {
         }
     }
 
-    private void removeGatewayFromDefaultTable() {
-
-    }
 
     private void dropIPTables() {
-        Shell.SU.run(new String[]{
+        rootSession.addCommand(new String[]{
                 "iptables -F",
                 "iptables -X",
                 //drop ipv6
                 "ip6tables -P INPUT DROP",
                 "ip6tables -P OUTPUT DROP",
                 "ip6tables -P FORWARD DROP"
-        });
+        }, DROP_TABLES_CODE, errorCallback);
     }
 
     private void updateIPTables() {
         dropIPTables();
 
+        String iptables = null;
+        int commandCode = 0;
+        boolean anyAvoidVPN = false;
+
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
         for (ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
+            switch(applicationItem.getState()){
+                case AVOID_VPN:
+                    anyAvoidVPN = true;
+                    commandCode = AVOID_VPN_IPTABLES_CODE;
+                    iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner "+applicationItem.getUID() +" -j MARK --set-mark 0x1";
+                    break;
+                case BLOCK:
+                    commandCode = BLOCK_IPTABLES_CODE;
+                    iptables = "iptables -A OUTPUT -m owner --uid-owner"+applicationItem.getUID() +" -j DROP";
+                    break;
+                case THROUGH_VPN:
+                    break;
+            }
+            if(iptables != null){
+                rootSession.addCommand(iptables,commandCode,errorCallback);
+            }
+        }
+        if(anyAvoidVPN){
+            rootSession.addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE",POSTROUTING_IPTABLES_CODE,errorCallback);
         }
     }
 
     private void setRoutingForMarkedPackets() {
-
+        rootSession.addCommand("ip rule add from all fwmark 0x1 lookup default",ROUTING_MARKED_PACKETS_CODE,errorCallback);
     }
 
     private void addGatewayToDefaultTable() {
@@ -154,17 +208,27 @@ public class NetworkManagerIntentService extends IntentService {
                 Log.d("VPNTOGGLE", "Unknown type " + net.getType());
         }
         if (interfaceName != null) {
-
+            rootSession.addCommand(new String[]{
+                    //TODO: check if gateway is needed
+                                //via $GATEWAYIP
+                    "ip route replace default dev "+interfaceName+" table default",
+                            "ip route append default via 127.0.0.1 dev lo table default",
+                            "ip route flush cache"
+            });
         }
     }
 
     private String getMobileNetworkName() {
+        //TODO: get name from mobile network address
         Enumeration<NetworkInterface> networkInterfaces = null;
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
 
             for (; networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Log.d("VPNTOGGLE",networkInterface.getName());
+                Log.d("VPNTOGGLE",networkInterface.getHardwareAddress().toString());
+                Log.d("VPNTOGGLE",networkInterface.getInetAddresses().toString());
 
             }
         } catch (SocketException e) {

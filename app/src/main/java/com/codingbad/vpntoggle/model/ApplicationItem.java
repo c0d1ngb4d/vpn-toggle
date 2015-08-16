@@ -89,6 +89,11 @@ public class ApplicationItem implements Parcelable {
         dest.writeInt(state);
     }
 
+    public String getUID() {
+        //TODO: save UID for app
+        return null;
+    }
+
     public enum StateEnum {
         THROUGH_VPN, AVOID_VPN, BLOCK;
 
