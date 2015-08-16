@@ -37,29 +37,7 @@ public class NetworkManagerIntentService extends IntentService {
     private static final String ACTION_INIT = "com.codingbad.vpntoggle.service.action.INIT";
     private static final String APPLICATIONS = "applications";
 
-    private static final int DROP_TABLES_CODE = 0;
-    private static final int BLOCK_IPTABLES_CODE = 1;
-    private static final int AVOID_VPN_IPTABLES_CODE = 1;
-    private static final int POSTROUTING_IPTABLES_CODE = 2;
-    private static final int ROUTING_MARKED_PACKETS_CODE = 3;
-
     private static Shell.Interactive rootSession;
-
-    private static Shell.OnCommandResultListener errorCallback = new Shell.OnCommandResultListener() {
-
-        @Override
-        public void onCommandResult(int commandCode, int exitCode, List<String> list) {
-            if (exitCode < 0) {
-                reportError("Error executing commands:" +
-                        commandCode+" exitCode " + exitCode);
-            }
-        }
-    };
-
-    private static void reportError(String error){
-        Log.d("VPNTOGGLE", error);
-    }
-
 
     public NetworkManagerIntentService() {
         super("NetworkManagerIntentService");
@@ -129,7 +107,7 @@ public class NetworkManagerIntentService extends IntentService {
     }
 
     private void handleActionRefresh() {
-        updateIPTables();
+        handleActionInit();
     }
 
     private void handleActionChange() {
@@ -155,14 +133,13 @@ public class NetworkManagerIntentService extends IntentService {
                 "ip6tables -P INPUT DROP",
                 "ip6tables -P OUTPUT DROP",
                 "ip6tables -P FORWARD DROP"
-        }, DROP_TABLES_CODE, errorCallback);
+        });
     }
 
     private void updateIPTables() {
         dropIPTables();
 
         String iptables = null;
-        int commandCode = 0;
         boolean anyAvoidVPN = false;
 
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
@@ -170,22 +147,20 @@ public class NetworkManagerIntentService extends IntentService {
             switch(applicationItem.getState()){
                 case AVOID_VPN:
                     anyAvoidVPN = true;
-                    commandCode = AVOID_VPN_IPTABLES_CODE;
                     iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner "+applicationItem.getUID() +" -j MARK --set-mark 0x1";
                     break;
                 case BLOCK:
-                    commandCode = BLOCK_IPTABLES_CODE;
                     iptables = "iptables -A OUTPUT -m owner --uid-owner"+applicationItem.getUID() +" -j DROP";
                     break;
                 case THROUGH_VPN:
                     break;
             }
             if(iptables != null){
-                rootSession.addCommand(iptables,commandCode,errorCallback);
+                rootSession.addCommand(iptables);
             }
         }
         if(anyAvoidVPN){
-            rootSession.addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE",POSTROUTING_IPTABLES_CODE,errorCallback);
+            rootSession.addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE");
         }
     }
 
@@ -194,7 +169,7 @@ public class NetworkManagerIntentService extends IntentService {
                 new String[]{
                         "ip rule del from all fwmark 0x1 lookup default",
                         "ip rule add from all fwmark 0x1 lookup default"
-                },ROUTING_MARKED_PACKETS_CODE,errorCallback);
+                });
     }
 
     private void addGatewayToDefaultTable() {
@@ -238,7 +213,7 @@ public class NetworkManagerIntentService extends IntentService {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return null;
+        return "rmnet0";
     }
 
     private String getWifiNetworkName() {
