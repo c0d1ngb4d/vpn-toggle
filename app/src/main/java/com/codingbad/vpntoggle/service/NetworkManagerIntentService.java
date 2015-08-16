@@ -134,6 +134,7 @@ public class NetworkManagerIntentService extends IntentService {
 
     private void handleActionChange() {
         if(isVpnConnected()) {
+            setRoutingForMarkedPackets();
             addGatewayToDefaultTable();
         }
     }
@@ -145,7 +146,6 @@ public class NetworkManagerIntentService extends IntentService {
             addGatewayToDefaultTable();
         }
     }
-
 
     private void dropIPTables() {
         rootSession.addCommand(new String[]{
@@ -190,7 +190,11 @@ public class NetworkManagerIntentService extends IntentService {
     }
 
     private void setRoutingForMarkedPackets() {
-        rootSession.addCommand("ip rule add from all fwmark 0x1 lookup default",ROUTING_MARKED_PACKETS_CODE,errorCallback);
+        rootSession.addCommand(
+                new String[]{
+                        "ip rule del from all fwmark 0x1 lookup default",
+                        "ip rule add from all fwmark 0x1 lookup default"
+                },ROUTING_MARKED_PACKETS_CODE,errorCallback);
     }
 
     private void addGatewayToDefaultTable() {

@@ -12,6 +12,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        NetworkManagerIntentService.startActionChange(context);
+        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            NetworkManagerIntentService.startActionInit(context);
+        } else {
+            NetworkManagerIntentService.startActionChange(context);
+        }
     }
 }
