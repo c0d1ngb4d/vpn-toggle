@@ -4,23 +4,24 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.codingbad.library.utils.ComplexSharedPreference;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
 
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import eu.chainfire.libsuperuser.Shell;
 
@@ -36,6 +37,9 @@ public class NetworkManagerIntentService extends IntentService {
     private static final String ACTION_CHANGE = "com.codingbad.vpntoggle.service.action.CHANGE";
     private static final String ACTION_INIT = "com.codingbad.vpntoggle.service.action.INIT";
     private static final String APPLICATIONS = "applications";
+
+    private static final String MOBILE_DATA_INTERFACES[] = {"rmnet\\d", "pdp\\d", "ppp\\d", "uwbr\\d", "wimax\\d", "vsnet\\d", "ccmni\\d", "usb\\d"};
+    private static final String WIFI_INTERFACES[] = {"tiwlan\\d", "wlan\\d", "et\\d+", "ra\\d"};
 
     private static Shell.Interactive rootSession;
 
@@ -69,8 +73,12 @@ public class NetworkManagerIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            if(rootSession == null){
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (intent != null && activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting()) {
+            if (rootSession == null) {
                 rootSession = new Shell.Builder().
                         useSU().
                         setWantSTDERR(true).
@@ -87,6 +95,7 @@ public class NetworkManagerIntentService extends IntentService {
             }
         }
     }
+
 
     private boolean isVpnConnected() {
         Enumeration<NetworkInterface> networkInterfaces = null;
@@ -111,7 +120,7 @@ public class NetworkManagerIntentService extends IntentService {
     }
 
     private void handleActionChange() {
-        if(isVpnConnected()) {
+        if (isVpnConnected()) {
             setRoutingForMarkedPackets();
             addGatewayToDefaultTable();
         }
@@ -144,22 +153,22 @@ public class NetworkManagerIntentService extends IntentService {
 
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
         for (ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
-            switch(applicationItem.getState()){
+            switch (applicationItem.getState()) {
                 case AVOID_VPN:
                     anyAvoidVPN = true;
-                    iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner "+applicationItem.getUID() +" -j MARK --set-mark 0x1";
+                    iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner " + applicationItem.getUID() + " -j MARK --set-mark 0x1";
                     break;
                 case BLOCK:
-                    iptables = "iptables -A OUTPUT -m owner --uid-owner"+applicationItem.getUID() +" -j DROP";
+                    iptables = "iptables -A OUTPUT -m owner --uid-owner" + applicationItem.getUID() + " -j DROP";
                     break;
                 case THROUGH_VPN:
                     break;
             }
-            if(iptables != null){
+            if (iptables != null) {
                 rootSession.addCommand(iptables);
             }
         }
-        if(anyAvoidVPN){
+        if (anyAvoidVPN) {
             rootSession.addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE");
         }
     }
@@ -179,23 +188,28 @@ public class NetworkManagerIntentService extends IntentService {
         switch (net.getType()) {
             case ConnectivityManager.TYPE_MOBILE:
                 interfaceName = getMobileNetworkName();
+                rootSession.addCommand(new String[]{
+                        //TODO: check if gateway is needed
+                        "ip route replace default dev " + interfaceName + " table default",
+                        "ip route append default via 127.0.0.1 dev lo table default",
+                        "ip route flush cache"
+                });
                 break;
             case ConnectivityManager.TYPE_WIFI:
-                interfaceName = getWifiNetworkName();
+                Map<String, String> map = getWifiNetworkName();
+                interfaceName = map.get("interface");
+                String gateway = map.get("gateway");
+                rootSession.addCommand(new String[]{
+                        "ip route replace default via " + gateway + " dev " + interfaceName + " table default",
+                        "ip route append default via 127.0.0.1 dev lo table default",
+                        "ip route flush cache"
+                });
                 break;
             default:
                 Log.d("VPNTOGGLE", "Unknown type " + net.getType());
         }
-        if (interfaceName != null) {
-            rootSession.addCommand(new String[]{
-                    //TODO: check if gateway is needed
-                                //via $GATEWAYIP
-                    "ip route replace default dev "+interfaceName+" table default",
-                            "ip route append default via 127.0.0.1 dev lo table default",
-                            "ip route flush cache"
-            });
-        }
     }
+
 
     private String getMobileNetworkName() {
         //TODO: get name from mobile network address
@@ -205,32 +219,60 @@ public class NetworkManagerIntentService extends IntentService {
 
             for (; networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Log.d("VPNTOGGLE",networkInterface.getName());
-                Log.d("VPNTOGGLE",networkInterface.getHardwareAddress().toString());
-                Log.d("VPNTOGGLE",networkInterface.getInetAddresses().toString());
+                String interfaceName = networkInterface.getName();
+                for (String possibleInterface : MOBILE_DATA_INTERFACES) {
+                    Pattern interfacePattern = Pattern.compile(possibleInterface);
+                    if (interfacePattern.matcher(interfaceName).matches() && networkInterface.getInetAddresses() != null) {
+                        Enumeration<InetAddress> addreses = networkInterface.getInetAddresses();
+                        for (; addreses.hasMoreElements(); ) {
+                            InetAddress address = addreses.nextElement();
+                            if (!address.isLinkLocalAddress()) {
+                                return networkInterface.getName();
+                            }
+                        }
+
+                    }
+                }
+
 
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return "rmnet0";
+        return null;
     }
 
-    private String getWifiNetworkName() {
+    public static InetAddress intToInetAddress(int hostAddress) {
+        byte[] addressBytes = { (byte)(0xff & hostAddress),
+                (byte)(0xff & (hostAddress >> 8)),
+                (byte)(0xff & (hostAddress >> 16)),
+                (byte)(0xff & (hostAddress >> 24)) };
+
+        try {
+            return InetAddress.getByAddress(addressBytes);
+        } catch (UnknownHostException e) {
+            throw new AssertionError();
+        }
+    }
+
+    private Map<String, String> getWifiNetworkName() {
+        Map network = new HashMap<String, String>();
+
+        //get gateway
         WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+        network.put("gateway", intToInetAddress(dhcpInfo.gateway).getHostAddress());
+
+        //get interface name
         int ipAddress = wifiInfo.getIpAddress();
-        byte[] bytes = BigInteger.valueOf(ipAddress).toByteArray();
-        InetAddress addr = null;
+        InetAddress addr = intToInetAddress(ipAddress);
         try {
-            addr = InetAddress.getByAddress(bytes);
             NetworkInterface netInterface = NetworkInterface.getByInetAddress(addr);
-            return netInterface.getName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+            network.put("interface", netInterface.getName());
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return null;
+        return network;
     }
 }
