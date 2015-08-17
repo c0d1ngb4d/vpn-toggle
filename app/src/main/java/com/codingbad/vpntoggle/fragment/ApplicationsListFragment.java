@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import com.codingbad.library.fragment.AbstractFragment;
 import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.adapter.ItemsAdapter;
 import com.codingbad.vpntoggle.model.ApplicationItem;
+import com.codingbad.vpntoggle.model.ApplicationsStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +32,13 @@ import roboguice.inject.InjectView;
 /**
  * Created by ayi on 6/26/15.
  */
-public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> {
+public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements View.OnClickListener {
 
     private static final String LIST_STATE = "listState";
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private List<ApplicationItem> applications;
+    private ApplicationsStatus applications;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -60,7 +62,13 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_apply) {
-            callbacks.onChangesApplied(applications);
+            applications.apply();
+            callbacks.onChangesApplied(applications.getApplicationItems());
+            Snackbar.make(getActivity().findViewById(android.R.id.content), "Changes has been applied", Snackbar.LENGTH_LONG)
+                    .setAction("Undo", this)
+                    .setActionTextColor(getResources().getColor(R.color.accent))
+                    .show();
+
             return true;
         }
 
@@ -72,14 +80,16 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         super.onResume();
 
         if (applications == null) {
-            applications = callbacks.getApplicationsSavedStatus();
-            if (applications == null) {
-                applications = getDeviceApplications();
+            List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
+            if (items == null) {
+                items = getDeviceApplications();
             }
+
+            applications = new ApplicationsStatus(items);
         }
 
         ItemsAdapter adapter = new ItemsAdapter();
-        adapter.addItemList(applications);
+        adapter.addItemList(applications.getApplicationItems());
         recyclerView.setAdapter(adapter);
     }
 
@@ -97,14 +107,15 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            applications = savedInstanceState.getParcelableArrayList(LIST_STATE);
+            ArrayList<ApplicationItem> list = savedInstanceState.getParcelableArrayList(LIST_STATE);
+            applications = new ApplicationsStatus(list);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications);
+        outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications.getApplicationItems());
     }
 
     private ArrayList<ApplicationItem> getDeviceApplications() {
@@ -134,6 +145,15 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         }
 
         return new ArrayList<ApplicationItem>(applicationItemMap.values());
+    }
+
+    @Override
+    public void onClick(View v) {
+        // UNDO apply
+        callbacks.onChangesApplied(applications.undo());
+        ItemsAdapter adapter = new ItemsAdapter();
+        adapter.addItemList(applications.getApplicationItems());
+        recyclerView.setAdapter(adapter);
     }
 
     public interface Callbacks {
