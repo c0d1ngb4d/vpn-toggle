@@ -73,9 +73,9 @@ public class NetworkManagerIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        ConnectivityManager cm =
+        ConnectivityManager connectivityManager =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (intent != null && activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting()) {
             if (rootSession == null) {
@@ -138,6 +138,8 @@ public class NetworkManagerIntentService extends IntentService {
         rootSession.addCommand(new String[]{
                 "iptables -F",
                 "iptables -X",
+                "iptables -t mangle -F",
+                "iptables -t mangle -X",
                 //drop ipv6
                 "ip6tables -P INPUT DROP",
                 "ip6tables -P OUTPUT DROP",
@@ -147,9 +149,8 @@ public class NetworkManagerIntentService extends IntentService {
 
     private void updateIPTables() {
         dropIPTables();
-
-        String iptables = null;
         boolean anyAvoidVPN = false;
+        String iptables = null;
 
         ListOfApplicationItems listOfApplicationItems = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
         for (ApplicationItem applicationItem : listOfApplicationItems.getApplicationItems()) {
@@ -159,9 +160,10 @@ public class NetworkManagerIntentService extends IntentService {
                     iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner " + applicationItem.getUID() + " -j MARK --set-mark 0x1";
                     break;
                 case BLOCK:
-                    iptables = "iptables -A OUTPUT -m owner --uid-owner" + applicationItem.getUID() + " -j DROP";
+                    iptables = "iptables -A OUTPUT -m owner --uid-owner " +applicationItem.getUID()+ " -j DROP";
                     break;
                 case THROUGH_VPN:
+                    iptables = null;
                     break;
             }
             if (iptables != null) {
