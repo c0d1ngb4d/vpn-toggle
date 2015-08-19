@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">VPN Toggle</string>
+
+    <string name="description">Descripción</string>
+    <string name="apply">Aplicar</string>
+    <string name="about">Acerca de nosotros</string>
+    <string name="header">VPN Toggle</string>
+    <string name="howto">Cómo usar</string>
+    <string name="main">Principal</string>
+    <string name="dev1">Ayelen Chavez</string>
+    <string name="dev2">Joaquin Rinaudo</string>
+    <string name="dev1email">ashy.on.line@gmail.com</string>
+    <string name="dev2email">jmrinaudo@gmail.com</string>
+    <string name="equal">=</string>
+    <string name="avoid_vpn">Evitar VPN</string>
+    <string name="through_vpn">Usar VPN</string>
+    <string name="block">Bloquear</string>
+    <string name="avoid_description">La applicación usará la red como si la VPN no estuviese corriendo.</string>
+    <string name="through_description">La applicación usará la VPN corriendo.</string>
+    <string name="block_description">Los paquetes salientes de la applicación serán descartados.</string>
+    <string name="noroot">Lo siento, pero su dispositivo no está correctamente rooteado.</string>
+    <string name="developers">Desarrolladores:</string>
+</resources>
