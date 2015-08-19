@@ -7,7 +7,9 @@ import android.view.MenuItem;
 import com.codingbad.library.activity.AbstractSideBarActivity;
 import com.codingbad.library.utils.ComplexSharedPreference;
 import com.codingbad.vpntoggle.R;
+import com.codingbad.vpntoggle.fragment.AboutFragment;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
+import com.codingbad.vpntoggle.fragment.HowToFragment;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
 import com.codingbad.vpntoggle.service.NetworkManagerIntentService;
@@ -43,9 +45,19 @@ public class MainActivity extends AbstractSideBarActivity implements Application
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch (id) {
+            case R.id.action_about:
+                replaceFragment(AboutFragment.newInstance());
+                break;
+            case R.id.action_howto:
+                replaceFragment(HowToFragment.newInstance());
+                break;
+            case R.id.action_main:
+                replaceFragment(ApplicationsListFragment.newInstance());
+                break;
+            case R.id.action_settings:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
