@@ -8,4 +8,15 @@
     <string name="header">VPN Toggle</string>
     <string name="howto">How To</string>
     <string name="main">Main</string>
+    <string name="dev1">Ayelen Chavez</string>
+    <string name="dev2">Joaquin Rinaudo</string>
+    <string name="dev1email">ashy.on.line@gmail.com</string>
+    <string name="dev2email">jmrinaudo@gmail.com</string>
+    <string name="equal">=</string>
+    <string name="avoid_vpn">Avoid VPN</string>
+    <string name="through_vpn">Through VPN</string>
+    <string name="block">Block</string>
+    <string name="avoid_description">Application will use networking as if the VPN wasn\'t running.</string>
+    <string name="through_description">Application will use the running VPN.</string>
+    <string name="block_description">Application\'s outgoing packets will be dropped.</string>
 </resources>

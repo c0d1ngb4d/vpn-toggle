@@ -9,4 +9,6 @@
   <color name="icons">#FFFFFF</color>
   <color name="divider">#B6B6B6</color>
   <color name="checked">#D1C4E9</color>
+  <color name="through_vpn">#4caf50</color>
+  <color name="block">#f44336</color>
 </resources>
