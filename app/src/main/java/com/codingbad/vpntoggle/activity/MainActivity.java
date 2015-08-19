@@ -56,8 +56,6 @@ public class MainActivity extends AbstractSideBarActivity implements Application
             case R.id.action_main:
                 replaceFragment(ApplicationsListFragment.newInstance());
                 break;
-            case R.id.action_settings:
-                break;
         }
 
         return super.onOptionsItemSelected(item);
