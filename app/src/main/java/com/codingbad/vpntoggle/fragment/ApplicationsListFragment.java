@@ -115,7 +115,9 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications.getApplicationItems());
+        if (applications != null) {
+            outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications.getApplicationItems());
+        }
     }
 
     private ArrayList<ApplicationItem> getDeviceApplications() {
