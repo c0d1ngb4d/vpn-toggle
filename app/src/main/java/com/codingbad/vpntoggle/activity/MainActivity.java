@@ -1,6 +1,7 @@
 package com.codingbad.vpntoggle.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,6 +11,7 @@ import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.fragment.AboutFragment;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
 import com.codingbad.vpntoggle.fragment.HowToFragment;
+import com.codingbad.vpntoggle.fragment.NoRootFragment;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
 import com.codingbad.vpntoggle.service.NetworkManagerIntentService;
@@ -28,7 +30,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
 
     @Override
     protected void setInitialFragment() {
-        setInitialFragment(ApplicationsListFragment.newInstance());
+        setInitialFragment(getMainFragment());
     }
 
     @Override
@@ -54,11 +56,19 @@ public class MainActivity extends AbstractSideBarActivity implements Application
                 replaceFragment(HowToFragment.newInstance());
                 break;
             case R.id.action_main:
-                replaceFragment(ApplicationsListFragment.newInstance());
+                replaceFragment(getMainFragment());
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Fragment getMainFragment() {
+        if (NetworkManagerIntentService.isSUAvailable()) {
+            ApplicationsListFragment.newInstance();
+        }
+
+        return NoRootFragment.newInstance();
     }
 
     @Override
