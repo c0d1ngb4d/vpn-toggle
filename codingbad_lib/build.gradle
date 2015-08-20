@@ -1,2 +1,2 @@
 configurations.create("default")
-artifacts.add("default", file('library-debug.aar'))
+artifacts.add("default", file('codingbad_lib.aar'))
