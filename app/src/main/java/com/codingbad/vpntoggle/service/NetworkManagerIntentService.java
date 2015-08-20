@@ -43,15 +43,35 @@ public class NetworkManagerIntentService extends IntentService {
 
     private static Shell.Interactive rootSession;
 
+    public static Shell.Interactive getRootSession() {
+        if (rootSession == null) {
+            initRootSession();
+        }
+
+        return rootSession;
+    }
+
+    public static boolean isSUAvailable() {
+        return Shell.SU.available();
+    }
+
+    private static void initRootSession() {
+        rootSession = new Shell.Builder().
+                useSU().
+                setWantSTDERR(true).
+                setWatchdogTimeout(5).
+                setMinimalLogging(true).open();
+    }
+
     public NetworkManagerIntentService() {
         super("NetworkManagerIntentService");
     }
 
     /**
+    * @see IntentService
      * Starts this service to perform action Foo with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
-     * @see IntentService
      */
     public static void startActionRefresh(Context context) {
         Intent intent = new Intent(context, NetworkManagerIntentService.class);
@@ -78,13 +98,7 @@ public class NetworkManagerIntentService extends IntentService {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (intent != null && activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting()) {
-            if (rootSession == null) {
-                rootSession = new Shell.Builder().
-                        useSU().
-                        setWantSTDERR(true).
-                        setWatchdogTimeout(5).
-                        setMinimalLogging(true).open();
-            }
+
             final String action = intent.getAction();
             if (ACTION_REFRESH.equals(action)) {
                 handleActionRefresh();
@@ -135,7 +149,7 @@ public class NetworkManagerIntentService extends IntentService {
     }
 
     private void dropIPTables() {
-        rootSession.addCommand(new String[]{
+        NetworkManagerIntentService.getRootSession().addCommand(new String[]{
                 "iptables -F",
                 "iptables -X",
                 "iptables -t mangle -F",
@@ -167,16 +181,16 @@ public class NetworkManagerIntentService extends IntentService {
                     break;
             }
             if (iptables != null) {
-                rootSession.addCommand(iptables);
+                NetworkManagerIntentService.getRootSession().addCommand(iptables);
             }
         }
         if (anyAvoidVPN) {
-            rootSession.addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE");
+            NetworkManagerIntentService.getRootSession().addCommand("iptables -t nat -A POSTROUTING -j MASQUERADE");
         }
     }
 
     private void setRoutingForMarkedPackets() {
-        rootSession.addCommand(
+        NetworkManagerIntentService.getRootSession().addCommand(
                 new String[]{
                         "ip rule del from all fwmark 0x1 lookup default",
                         "ip rule add from all fwmark 0x1 lookup default"
@@ -190,7 +204,7 @@ public class NetworkManagerIntentService extends IntentService {
         switch (net.getType()) {
             case ConnectivityManager.TYPE_MOBILE:
                 interfaceName = getMobileNetworkName();
-                rootSession.addCommand(new String[]{
+                NetworkManagerIntentService.getRootSession().addCommand(new String[]{
                         //TODO: check if gateway is needed
                         "ip route replace default dev " + interfaceName + " table default",
                         "ip route append default via 127.0.0.1 dev lo table default",
@@ -201,7 +215,7 @@ public class NetworkManagerIntentService extends IntentService {
                 Map<String, String> map = getWifiNetworkName();
                 interfaceName = map.get("interface");
                 String gateway = map.get("gateway");
-                rootSession.addCommand(new String[]{
+                NetworkManagerIntentService.getRootSession().addCommand(new String[]{
                         "ip route replace default via " + gateway + " dev " + interfaceName + " table default",
                         "ip route append default via 127.0.0.1 dev lo table default",
                         "ip route flush cache"

@@ -10,18 +10,18 @@ import com.codingbad.library.fragment.AbstractFragment;
 import com.codingbad.vpntoggle.R;
 
 /**
- * Created by ayi on 8/17/15.
+ * Created by ayi on 8/19/15.
  */
-public class AboutFragment extends AbstractFragment<AboutFragment.Callbacks> {
+public class NoRootFragment extends AbstractFragment<NoRootFragment.Callbacks> {
     public class Callbacks {
     }
 
     public static Fragment newInstance() {
-        return new AboutFragment();
+        return new NoRootFragment();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_about, container, false);
+        return inflater.inflate(R.layout.fragment_noroot, container, false);
     }
 }

@@ -18,4 +18,6 @@
     <string name="avoid_description">Application will use networking as if the VPN wasn\'t running.</string>
     <string name="through_description">Application will use the running VPN.</string>
     <string name="block_description">Application\'s outgoing packets will be dropped.</string>
+    <string name="noroot">Sorry, but you don\'t have root access.</string>
+    <string name="developers">Developers:</string>
 </resources>
