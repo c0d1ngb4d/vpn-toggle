@@ -21,6 +21,7 @@ import java.util.List;
 public class MainActivity extends AbstractSideBarActivity implements ApplicationsListFragment.Callbacks {
 
     private static final String APPLICATIONS = "applications";
+    private static boolean isSuAvailable = NetworkManagerIntentService.isSUAvailable();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,7 +31,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
 
     @Override
     protected void setInitialFragment() {
-        setInitialFragment(getMainFragment());
+        setInitialFragment(getInitialFragment());
     }
 
     @Override
@@ -56,15 +57,15 @@ public class MainActivity extends AbstractSideBarActivity implements Application
                 replaceFragment(HowToFragment.newInstance());
                 break;
             case R.id.action_main:
-                replaceFragment(getMainFragment());
+                replaceFragment(getInitialFragment());
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private Fragment getMainFragment() {
-        if (NetworkManagerIntentService.isSUAvailable()) {
+    private Fragment getInitialFragment() {
+        if (isSuAvailable) {
             ApplicationsListFragment.newInstance();
         }
 
