@@ -66,7 +66,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
 
     private Fragment getInitialFragment() {
         if (isSuAvailable) {
-            ApplicationsListFragment.newInstance();
+            return ApplicationsListFragment.newInstance();
         }
 
         return NoRootFragment.newInstance();
