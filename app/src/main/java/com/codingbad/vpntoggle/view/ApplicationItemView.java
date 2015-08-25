@@ -30,10 +30,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.codingbad.library.utils.ViewUtil;
 import com.codingbad.library.view.ThreeStatesButton;
 import com.codingbad.vpntoggle.R;
 import com.codingbad.vpntoggle.model.ApplicationItem;
-import com.codingbad.vpntoggle.util.ViewUtil;
 
 import roboguice.inject.InjectView;
 
