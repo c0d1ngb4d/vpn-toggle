@@ -21,4 +21,6 @@
     <string name="noroot">Sorry, but you don\'t have root access.</string>
     <string name="developers">Developers:</string>
     <string name="rate_me">Rate me</string>
+    <string name="search">Search</string>
+    <string name="thanks">Thanks! ;)</string>
 </resources>

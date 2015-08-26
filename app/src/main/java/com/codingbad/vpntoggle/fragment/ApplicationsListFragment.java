@@ -29,9 +29,13 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,19 +51,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 import roboguice.inject.InjectView;
 
 /**
  * Created by ayi on 6/26/15.
  */
-public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements View.OnClickListener {
+public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     private static final String LIST_STATE = "listState";
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private ApplicationsStatus applications;
+    private ItemsAdapter adapter;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -109,7 +113,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
             applications = new ApplicationsStatus(items);
         }
 
-        ItemsAdapter adapter = new ItemsAdapter();
+        adapter = new ItemsAdapter();
         adapter.addItemList(applications.getApplicationItems());
         recyclerView.setAdapter(adapter);
     }
@@ -119,9 +123,6 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         // set layout manager which positions items in the screen
         layoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setLayoutManager(layoutManager);
-
-        // ItemAnimator animates views
-        recyclerView.setItemAnimator(new FadeInAnimator());
     }
 
     @Override
@@ -174,14 +175,49 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onClick(View v) {
         // UNDO apply
         callbacks.onChangesApplied(applications.undo());
-        ItemsAdapter adapter = new ItemsAdapter();
+        adapter = new ItemsAdapter();
         adapter.addItemList(applications.getApplicationItems());
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query) {
+        final List<ApplicationItem> filteredModelList = filter(applications.getApplicationItems(), query);
+        adapter.animateTo(filteredModelList);
+        recyclerView.scrollToPosition(0);
+        return true;
+    }
+
+    private List<ApplicationItem> filter(List<ApplicationItem> items, String query) {
+        query = query.toLowerCase();
+
+        final List<ApplicationItem> filteredApplicationItems = new ArrayList<>();
+        for (ApplicationItem applicationItem : items) {
+            if (applicationItem.getApplicationName().toLowerCase().contains(query)) {
+                filteredApplicationItems.add(applicationItem);
+            }
+        }
+        return filteredApplicationItems;
     }
 
     public interface Callbacks {
         void onChangesApplied(List<ApplicationItem> applicationItems);
 
         List<ApplicationItem> getApplicationsSavedStatus();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+        // Retrieve the SearchView and plug it into SearchManager
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setOnQueryTextListener(this);
     }
 }
