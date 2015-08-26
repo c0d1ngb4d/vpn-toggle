@@ -20,4 +20,5 @@
     <string name="block_description">Los paquetes salientes de la applicación serán descartados.</string>
     <string name="noroot">Lo siento, pero su dispositivo no está correctamente rooteado.</string>
     <string name="developers">Desarrolladores:</string>
+    <string name="rate_me">Calificar</string>
 </resources>

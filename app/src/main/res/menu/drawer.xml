@@ -12,6 +12,12 @@
             android:icon="@drawable/ic_action_action_help"
             android:title="@string/howto"/>
         <item
+            android:id="@+id/action_rate_me"
+            android:checked="false"
+            android:icon="@drawable/ic_action_action_grade"
+            android:title="@string/rate_me"
+            />
+        <item
             android:id="@+id/action_about"
             android:checked="false"
             android:icon="@drawable/ic_action_action_info_outline"

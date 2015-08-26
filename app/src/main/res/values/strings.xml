@@ -20,4 +20,5 @@
     <string name="block_description">Application\'s outgoing packets will be dropped.</string>
     <string name="noroot">Sorry, but you don\'t have root access.</string>
     <string name="developers">Developers:</string>
+    <string name="rate_me">Rate me</string>
 </resources>
