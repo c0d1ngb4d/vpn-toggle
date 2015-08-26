@@ -77,7 +77,6 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         setupRecyclerView();
     }
 
@@ -205,12 +204,6 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         return filteredApplicationItems;
     }
 
-    public interface Callbacks {
-        void onChangesApplied(List<ApplicationItem> applicationItems);
-
-        List<ApplicationItem> getApplicationsSavedStatus();
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -219,5 +212,11 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchView.setOnQueryTextListener(this);
+    }
+
+    public interface Callbacks {
+        void onChangesApplied(List<ApplicationItem> applicationItems);
+
+        List<ApplicationItem> getApplicationsSavedStatus();
     }
 }

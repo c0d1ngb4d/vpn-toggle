@@ -34,9 +34,6 @@ import com.codingbad.vpntoggle.R;
  * Created by ayi on 8/17/15.
  */
 public class HowToFragment extends AbstractFragment<AboutFragment.Callbacks> {
-    public class Callbacks {
-    }
-
     public static Fragment newInstance() {
         return new HowToFragment();
     }
@@ -44,5 +41,8 @@ public class HowToFragment extends AbstractFragment<AboutFragment.Callbacks> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_howto, container, false);
+    }
+
+    public class Callbacks {
     }
 }
