@@ -73,9 +73,15 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
         holder.bind(applicationItem);
     }
 
-    public void addItem(ApplicationItem applicationItem) {
-        this.applicationList.add(applicationItem);
+    public void addItem(int position, ApplicationItem applicationItem) {
+        this.applicationList.add(position, applicationItem);
         notifyItemInserted(getItemCount());
+    }
+
+    public void moveItem(int fromPosition, int toPosition) {
+        final ApplicationItem moved = this.applicationList.remove(fromPosition);
+        this.applicationList.add(toPosition, moved);
+        notifyItemMoved(fromPosition, toPosition);
     }
 
     public void addItemList(List<ApplicationItem> applicationItems) {
@@ -88,9 +94,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void removeItemAt(int position) {
-        this.applicationList.remove(position);
+    public ApplicationItem removeItem(int position) {
+        final ApplicationItem removed = this.applicationList.remove(position);
         notifyItemRemoved(position);
+        return removed;
     }
 
     public ApplicationItem getItemAtPosition(int position) {
@@ -109,13 +116,46 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
         };
     }
 
-    protected Animator getAnimator(View view) {
-//        return ObjectAnimator.ofFloat(view, "translationY", view.getMeasuredHeight(), 0);
-        return getAlphaAnimator(view);
-    }
-
     protected Animator getAlphaAnimator(final View view) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(view, "alpha", 0.0f, 1.0f);
         return anim;
+    }
+
+    public void setItems(ArrayList<ApplicationItem> items) {
+        this.applicationList = items;
+    }
+
+    public void animateTo(List<ApplicationItem> models) {
+        applyAndAnimateRemovals(models);
+        applyAndAnimateAdditions(models);
+        applyAndAnimateMovedItems(models);
+    }
+
+    private void applyAndAnimateRemovals(List<ApplicationItem> newItems) {
+        for (int i = applicationList.size() - 1; i >= 0; i--) {
+            final ApplicationItem applicationItem = applicationList.get(i);
+            if (!newItems.contains(applicationItem)) {
+                removeItem(i);
+            }
+        }
+    }
+
+    private void applyAndAnimateAdditions(List<ApplicationItem> newItems) {
+        for (int i = 0, count = newItems.size(); i < count; i++) {
+            final ApplicationItem applicationItem = newItems.get(i);
+            if (!applicationList.contains(applicationItem)) {
+                addItem(i, applicationItem);
+            }
+        }
+    }
+
+    private void applyAndAnimateMovedItems(List<ApplicationItem> newItems) {
+        for (int toPosition = newItems.size() - 1; toPosition >= 0; toPosition--) {
+            final ApplicationItem applicationItem = newItems.get(toPosition);
+            final int fromPosition = applicationList.indexOf(applicationItem);
+            if (fromPosition >= 0 && fromPosition != toPosition) {
+                moveItem(fromPosition, toPosition);
+            }
+        }
     }
 }

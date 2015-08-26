@@ -64,6 +64,10 @@ public class NetworkManagerIntentService extends IntentService {
 
     private static Shell.Interactive rootSession;
 
+    public NetworkManagerIntentService() {
+        super("NetworkManagerIntentService");
+    }
+
     public static Shell.Interactive getRootSession() {
         if (rootSession == null) {
             initRootSession();
@@ -84,15 +88,10 @@ public class NetworkManagerIntentService extends IntentService {
                 setMinimalLogging(true).open();
     }
 
-    public NetworkManagerIntentService() {
-        super("NetworkManagerIntentService");
-    }
-
     /**
-    * @see IntentService
+     * @see IntentService
      * Starts this service to perform action Foo with the given parameters. If
      * the service is already performing a task this action will be queued.
-     *
      */
     public static void startActionRefresh(Context context) {
         Intent intent = new Intent(context, NetworkManagerIntentService.class);
@@ -110,6 +109,19 @@ public class NetworkManagerIntentService extends IntentService {
         Intent intent = new Intent(context, NetworkManagerIntentService.class);
         intent.setAction(ACTION_CHANGE);
         context.startService(intent);
+    }
+
+    public static InetAddress intToInetAddress(int hostAddress) {
+        byte[] addressBytes = {(byte) (0xff & hostAddress),
+                (byte) (0xff & (hostAddress >> 8)),
+                (byte) (0xff & (hostAddress >> 16)),
+                (byte) (0xff & (hostAddress >> 24))};
+
+        try {
+            return InetAddress.getByAddress(addressBytes);
+        } catch (UnknownHostException e) {
+            throw new AssertionError();
+        }
     }
 
     @Override
@@ -130,7 +142,6 @@ public class NetworkManagerIntentService extends IntentService {
             }
         }
     }
-
 
     private boolean isVpnConnected() {
         Enumeration<NetworkInterface> networkInterfaces = null;
@@ -195,7 +206,7 @@ public class NetworkManagerIntentService extends IntentService {
                     iptables = "iptables -t mangle -A OUTPUT -m owner --uid-owner " + applicationItem.getUID() + " -j MARK --set-mark 0x1";
                     break;
                 case BLOCK:
-                    iptables = "iptables -A OUTPUT -m owner --uid-owner " +applicationItem.getUID()+ " -j DROP";
+                    iptables = "iptables -A OUTPUT -m owner --uid-owner " + applicationItem.getUID() + " -j DROP";
                     break;
                 case THROUGH_VPN:
                     iptables = null;
@@ -247,7 +258,6 @@ public class NetworkManagerIntentService extends IntentService {
         }
     }
 
-
     private String getMobileNetworkName() {
         //TODO: get name from mobile network address
         Enumeration<NetworkInterface> networkInterfaces = null;
@@ -277,19 +287,6 @@ public class NetworkManagerIntentService extends IntentService {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static InetAddress intToInetAddress(int hostAddress) {
-        byte[] addressBytes = { (byte)(0xff & hostAddress),
-                (byte)(0xff & (hostAddress >> 8)),
-                (byte)(0xff & (hostAddress >> 16)),
-                (byte)(0xff & (hostAddress >> 24)) };
-
-        try {
-            return InetAddress.getByAddress(addressBytes);
-        } catch (UnknownHostException e) {
-            throw new AssertionError();
-        }
     }
 
     private Map<String, String> getWifiNetworkName() {

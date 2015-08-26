@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.codingbad.library.activity.AbstractSideBarActivity;
@@ -36,6 +35,7 @@ import com.codingbad.vpntoggle.fragment.AboutFragment;
 import com.codingbad.vpntoggle.fragment.ApplicationsListFragment;
 import com.codingbad.vpntoggle.fragment.HowToFragment;
 import com.codingbad.vpntoggle.fragment.NoRootFragment;
+import com.codingbad.vpntoggle.fragment.RateMeFragment;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.model.ListOfApplicationItems;
 import com.codingbad.vpntoggle.service.NetworkManagerIntentService;
@@ -59,13 +59,6 @@ public class MainActivity extends AbstractSideBarActivity implements Application
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -84,6 +77,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
                 replaceFragment(getInitialFragment());
                 break;
             case R.id.action_rate_me:
+                replaceFragment(RateMeFragment.newInstance());
                 goToGooglePlay();
                 break;
         }
