@@ -66,6 +66,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     private ApplicationsStatus applications;
     private ItemsAdapter adapter;
     private List<ApplicationItem> searchItems;
+    private SearchView searchView;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -114,17 +115,25 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
             applications = new ApplicationsStatus(items);
         }
 
-        if (adapter != null) {
-            searchItems = adapter.getSearchApplicationItems();
+        List<ApplicationItem> search = null;
+
+        // searchItems stored searched values when device was rotated
+        if (searchItems != null) {
+            search = searchItems;
+            searchItems = null;
+        } else if (adapter != null) {
+            // adapter is alive if fragment was not destroyed - app minimized, for example
+            search = adapter.getSearchApplicationItems();
         }
 
-        if (searchItems == null) {
-            searchItems = applications.getApplicationItems();
+        // if still null, show all the applications
+        if (search == null) {
+            search = applications.getApplicationItems();
         }
 
         adapter = new ItemsAdapter();
 
-        adapter.setItems(searchItems);
+        adapter.setItems(search);
         recyclerView.setAdapter(adapter);
     }
 
@@ -189,6 +198,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     @Override
     public void onClick(View v) {
         // UNDO apply
+        searchView.setQuery("", false);
+        searchView.clearFocus();
         callbacks.onChangesApplied(applications.undo());
         adapter = new ItemsAdapter();
         adapter.addItemList(applications.getApplicationItems());
@@ -226,7 +237,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_main, menu);
         // Retrieve the SearchView and plug it into SearchManager
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchView.setOnQueryTextListener(this);
     }
 
