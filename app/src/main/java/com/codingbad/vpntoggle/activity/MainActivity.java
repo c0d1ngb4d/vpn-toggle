@@ -110,9 +110,9 @@ public class MainActivity extends AbstractSideBarActivity implements Application
     }
 
     @Override
-    public void onChangesApplied(List<ApplicationItem> applicationItems) {
+    public void onChangesApplied(List<ApplicationItem> applications) {
         // save current state of applications
-        saveApplications(applicationItems);
+        saveApplications(applications);
 
         // start broadcast receiver to update changes
         NetworkManagerIntentService.startActionRefresh(this);
