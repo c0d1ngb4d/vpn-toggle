@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
+import com.codingbad.library.utils.ArrayUtils;
 import com.codingbad.vpntoggle.holder.ApplicationViewHolder;
 import com.codingbad.vpntoggle.model.ApplicationItem;
 import com.codingbad.vpntoggle.view.ApplicationItemView;
@@ -104,6 +105,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
         return this.applicationList.get(position);
     }
 
+    public List<ApplicationItem> getSearchApplicationItems() {
+        return applicationList;
+    }
+
     @Override
     public int getItemCount() {
         return this.applicationList.size();
@@ -121,8 +126,9 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
         return anim;
     }
 
-    public void setItems(ArrayList<ApplicationItem> items) {
-        this.applicationList = items;
+    public void setItems(List<ApplicationItem> items) {
+        this.applicationList = ArrayUtils.copyFrom(items);
+        notifyDataSetChanged();
     }
 
     public void animateTo(List<ApplicationItem> models) {

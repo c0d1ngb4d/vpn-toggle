@@ -59,11 +59,13 @@ import roboguice.inject.InjectView;
 public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     private static final String LIST_STATE = "listState";
+    private static final String SEARCH_STATE = "searchState";
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private ApplicationsStatus applications;
     private ItemsAdapter adapter;
+    private List<ApplicationItem> searchItems;
 
     public static Fragment newInstance() {
         return new ApplicationsListFragment();
@@ -112,8 +114,17 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
             applications = new ApplicationsStatus(items);
         }
 
+        if (adapter != null) {
+            searchItems = adapter.getSearchApplicationItems();
+        }
+
+        if (searchItems == null) {
+            searchItems = applications.getApplicationItems();
+        }
+
         adapter = new ItemsAdapter();
-        adapter.addItemList(applications.getApplicationItems());
+
+        adapter.setItems(searchItems);
         recyclerView.setAdapter(adapter);
     }
 
@@ -128,8 +139,9 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            ArrayList<ApplicationItem> list = savedInstanceState.getParcelableArrayList(LIST_STATE);
-            applications = new ApplicationsStatus(list);
+            ArrayList<ApplicationItem> applications = savedInstanceState.getParcelableArrayList(LIST_STATE);
+            this.applications = new ApplicationsStatus(applications);
+            searchItems = savedInstanceState.getParcelableArrayList(SEARCH_STATE);
         }
     }
 
@@ -138,6 +150,10 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         super.onSaveInstanceState(outState);
         if (applications != null) {
             outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications.getApplicationItems());
+        }
+
+        if (adapter != null) {
+            outState.putParcelableArrayList(SEARCH_STATE, (ArrayList<? extends Parcelable>) adapter.getSearchApplicationItems());
         }
     }
 
@@ -215,7 +231,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     }
 
     public interface Callbacks {
-        void onChangesApplied(List<ApplicationItem> applicationItems);
+        void onChangesApplied(List<ApplicationItem> applications);
 
         List<ApplicationItem> getApplicationsSavedStatus();
     }
