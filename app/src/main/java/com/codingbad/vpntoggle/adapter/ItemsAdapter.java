@@ -127,7 +127,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ApplicationViewHolder> {
     }
 
     public void setItems(List<ApplicationItem> items) {
-        this.applicationList = ArrayUtils.copyFrom(items);
+        this.applicationList = items;
         notifyDataSetChanged();
     }
 
