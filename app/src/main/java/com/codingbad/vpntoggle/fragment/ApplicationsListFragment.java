@@ -117,14 +117,17 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         super.onResume();
 
         if (applications == null) {
-            List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
             List<ApplicationItem> allApplications = getDeviceApplications();
-            for (ApplicationItem applicationItem : allApplications) {
-                if (!items.contains(applicationItem)) {
-                    items.add(applicationItem);
+
+            List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
+            int index;
+            for (ApplicationItem applicationItem : items) {
+                index = allApplications.indexOf(applicationItem);
+                if (index != -1) {
+                    allApplications.get(index).setState(applicationItem.getState());
                 }
             }
-            applications = new ApplicationsStatus(items);
+            applications = new ApplicationsStatus(allApplications);
         }
 
         List<ApplicationItem> search = null;
