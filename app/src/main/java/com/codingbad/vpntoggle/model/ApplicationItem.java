@@ -33,6 +33,7 @@ import android.os.Parcelable;
  * separated list of the applications' names.
  */
 public class ApplicationItem implements Parcelable {
+
     public static final Parcelable.Creator<ApplicationItem> CREATOR
             = new Parcelable.Creator<ApplicationItem>() {
         public ApplicationItem createFromParcel(Parcel in) {
@@ -43,9 +44,13 @@ public class ApplicationItem implements Parcelable {
             return new ApplicationItem[size];
         }
     };
+
     private String applicationName;
+
     private int uid;
+
     private String iconUri;
+
     private int state;
 
     public ApplicationItem(Uri icon, String applicationName, int uid) {
@@ -78,12 +83,11 @@ public class ApplicationItem implements Parcelable {
     }
 
     public boolean equals(Object object) {
-        if (!(object instanceof ApplicationItem))
-            return false;
-        if (object == this)
+        if (object == this) {
             return true;
-        ApplicationItem other = (ApplicationItem) object;
-        return other.getUID() == this.getUID();
+        }
+        return object instanceof ApplicationItem && ((ApplicationItem) object).getUID() == this
+                .getUID();
     }
 
     public Uri getIconUri() {

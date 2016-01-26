@@ -21,6 +21,12 @@
 */
 package com.codingbad.vpntoggle.fragment;
 
+import com.codingbad.library.fragment.AbstractFragment;
+import com.codingbad.vpntoggle.R;
+import com.codingbad.vpntoggle.adapter.ItemsAdapter;
+import com.codingbad.vpntoggle.model.ApplicationItem;
+import com.codingbad.vpntoggle.model.ApplicationsStatus;
+
 import android.Manifest;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -40,12 +46,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.codingbad.library.fragment.AbstractFragment;
-import com.codingbad.vpntoggle.R;
-import com.codingbad.vpntoggle.adapter.ItemsAdapter;
-import com.codingbad.vpntoggle.model.ApplicationItem;
-import com.codingbad.vpntoggle.model.ApplicationsStatus;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,16 +56,24 @@ import roboguice.inject.InjectView;
 /**
  * Created by ayi on 6/26/15.
  */
-public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks> implements View.OnClickListener, SearchView.OnQueryTextListener {
+public class ApplicationsListFragment extends AbstractFragment<ApplicationsListFragment.Callbacks>
+        implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     private static final String LIST_STATE = "listState";
+
     private static final String SEARCH_STATE = "searchState";
+
     @InjectView(R.id.fragment_list_recyclerview)
     private RecyclerView recyclerView;
+
     private LinearLayoutManager layoutManager;
+
     private ApplicationsStatus applications;
+
     private ItemsAdapter adapter;
+
     private List<ApplicationItem> searchItems;
+
     private SearchView searchView;
 
     public static Fragment newInstance() {
@@ -73,7 +81,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_applicationslist, container, false);
     }
 
@@ -91,7 +100,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         if (id == R.id.action_apply) {
             applications.apply();
             callbacks.onChangesApplied(applications.getApplicationItems());
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "Changes has been applied", Snackbar.LENGTH_LONG)
+            Snackbar.make(getActivity().findViewById(android.R.id.content),
+                    "Changes has been applied", Snackbar.LENGTH_LONG)
                     .setAction("Undo", this)
                     .setActionTextColor(getResources().getColor(R.color.accent))
                     .show();
@@ -107,13 +117,13 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         super.onResume();
 
         if (applications == null) {
-             List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
-             List<ApplicationItem> allApplications = getDeviceApplications();
-             for (ApplicationItem applicationItem :  allApplications) {
-                 if (! items.contains(applicationItem)) {
-                     items.add(applicationItem);
-                 }
-             }
+            List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
+            List<ApplicationItem> allApplications = getDeviceApplications();
+            for (ApplicationItem applicationItem : allApplications) {
+                if (!items.contains(applicationItem)) {
+                    items.add(applicationItem);
+                }
+            }
             applications = new ApplicationsStatus(items);
         }
 
@@ -150,7 +160,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            ArrayList<ApplicationItem> applications = savedInstanceState.getParcelableArrayList(LIST_STATE);
+            ArrayList<ApplicationItem> applications = savedInstanceState
+                    .getParcelableArrayList(LIST_STATE);
             this.applications = new ApplicationsStatus(applications);
             searchItems = savedInstanceState.getParcelableArrayList(SEARCH_STATE);
         }
@@ -160,26 +171,32 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (applications != null) {
-            outState.putParcelableArrayList(LIST_STATE, (ArrayList<? extends Parcelable>) applications.getApplicationItems());
+            outState.putParcelableArrayList(LIST_STATE,
+                    (ArrayList<? extends Parcelable>) applications.getApplicationItems());
         }
 
         if (adapter != null) {
-            outState.putParcelableArrayList(SEARCH_STATE, (ArrayList<? extends Parcelable>) adapter.getSearchApplicationItems());
+            outState.putParcelableArrayList(SEARCH_STATE,
+                    (ArrayList<? extends Parcelable>) adapter.getSearchApplicationItems());
         }
     }
 
     private ArrayList<ApplicationItem> getDeviceApplications() {
         final PackageManager packageManager = getActivity().getPackageManager();
-        List<ApplicationInfo> installedApplications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+        List<ApplicationInfo> installedApplications = packageManager
+                .getInstalledApplications(PackageManager.GET_META_DATA);
 
         Map<Integer, ApplicationItem> applicationItemMap = new HashMap<Integer, ApplicationItem>();
         for (ApplicationInfo applicationInfo : installedApplications) {
-            if (PackageManager.PERMISSION_GRANTED == packageManager.checkPermission(Manifest.permission.INTERNET, applicationInfo.packageName)) {
-                String appName = (String) (applicationInfo != null ? packageManager.getApplicationLabel(applicationInfo) : "(unknown)");
+            if (PackageManager.PERMISSION_GRANTED == packageManager
+                    .checkPermission(Manifest.permission.INTERNET, applicationInfo.packageName)) {
+                String appName = (String) (applicationInfo != null ? packageManager
+                        .getApplicationLabel(applicationInfo) : "(unknown)");
                 Uri appIconUri = null;
 
                 if (applicationInfo.icon != 0) {
-                    appIconUri = Uri.parse("android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon);
+                    appIconUri = Uri.parse("android.resource://" + applicationInfo.packageName + "/"
+                            + applicationInfo.icon);
                 }
 
                 int appUid = applicationInfo.uid;
@@ -189,7 +206,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
                     applicationItem.addApplication(appName);
                     applicationItemMap.put(appUid, applicationItem);
                 } else {
-                    applicationItemMap.put(appUid, new ApplicationItem(appIconUri, appName, appUid));
+                    applicationItemMap
+                            .put(appUid, new ApplicationItem(appIconUri, appName, appUid));
                 }
             }
         }
@@ -215,7 +233,8 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
 
     @Override
     public boolean onQueryTextChange(String query) {
-        final List<ApplicationItem> filteredModelList = filter(applications.getApplicationItems(), query);
+        final List<ApplicationItem> filteredModelList = filter(applications.getApplicationItems(),
+                query);
         adapter.animateTo(filteredModelList);
         recyclerView.scrollToPosition(0);
         return true;
@@ -244,6 +263,7 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
     }
 
     public interface Callbacks {
+
         void onChangesApplied(List<ApplicationItem> applications);
 
         List<ApplicationItem> getApplicationsSavedStatus();

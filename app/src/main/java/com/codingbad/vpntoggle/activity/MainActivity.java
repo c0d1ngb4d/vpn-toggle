@@ -104,11 +104,13 @@ public class MainActivity extends AbstractSideBarActivity implements Application
     }
 
     private Fragment getInitialFragment() {
+
+        return ApplicationsListFragment.newInstance(); /*
         if (isSuAvailable) {
             return ApplicationsListFragment.newInstance();
         }
 
-        return NoRootFragment.newInstance();
+        return NoRootFragment.newInstance();*/
     }
 
     @Override
