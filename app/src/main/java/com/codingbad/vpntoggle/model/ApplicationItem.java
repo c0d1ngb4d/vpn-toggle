@@ -77,6 +77,15 @@ public class ApplicationItem implements Parcelable {
         this.applicationName = applicationName;
     }
 
+    public boolean equals(Object object) {
+        if (!(object instanceof ApplicationItem))
+            return false;
+        if (object == this)
+            return true;
+        ApplicationItem other = (ApplicationItem) object;
+        return other.getUID() == this.getUID();
+    }
+
     public Uri getIconUri() {
         if (this.iconUri == null) {
             return null;
