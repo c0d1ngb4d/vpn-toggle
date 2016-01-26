@@ -41,6 +41,8 @@ import com.codingbad.vpntoggle.model.ListOfApplicationItems;
 import com.codingbad.vpntoggle.service.NetworkManagerIntentService;
 
 import java.util.List;
+import java.util.ArrayList;
+
 
 public class MainActivity extends AbstractSideBarActivity implements ApplicationsListFragment.Callbacks {
 
@@ -128,7 +130,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
     public List<ApplicationItem> getApplicationsSavedStatus() {
         ListOfApplicationItems items = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
         if (items == null) {
-            return null;
+            return new ArrayList<ApplicationItem>();
         }
         return items.applicationItems;
     }
