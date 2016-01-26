@@ -128,7 +128,7 @@ public class MainActivity extends AbstractSideBarActivity implements Application
     public List<ApplicationItem> getApplicationsSavedStatus() {
         ListOfApplicationItems items = ComplexSharedPreference.read(this, APPLICATIONS, ListOfApplicationItems.class);
         if (items == null) {
-            return null;
+            return new ArrayList<ApplicationItem>();
         }
         return items.applicationItems;
     }
