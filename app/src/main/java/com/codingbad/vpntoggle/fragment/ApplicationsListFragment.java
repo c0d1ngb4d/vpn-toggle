@@ -107,11 +107,13 @@ public class ApplicationsListFragment extends AbstractFragment<ApplicationsListF
         super.onResume();
 
         if (applications == null) {
-            List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
-            if (items == null) {
-                items = getDeviceApplications();
-            }
-
+             List<ApplicationItem> items = callbacks.getApplicationsSavedStatus();
+             List<ApplicationItem> allApplications = getDeviceApplications();
+             for (ApplicationItem applicationItem :  allApplications) {
+                 if (! items.contains(applicationItem)) {
+                     items.add(applicationItem);
+                 }
+             }
             applications = new ApplicationsStatus(items);
         }
 
