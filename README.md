@@ -16,7 +16,7 @@ Features:
 * It is easy to use.
 * It has no ads.
 * Open source code (https://github.com/c0d1ngb4d/vpn-toggle).
-
+* Google Play: https://play.google.com/store/apps/details?id=com.codingbad.vpntoggle
 
 Colaborators:
 
